@@ -1,0 +1,4 @@
+anthropic
+reportlab
+python-dotenv
+requests

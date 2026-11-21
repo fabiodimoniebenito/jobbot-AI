@@ -1,0 +1,10 @@
+.env
+cv_base.json
+salidas/
+pendientes.json
+vistas.json
+registro.csv
+__pycache__/
+
+ofertas.json
+ofertas.html
