@@ -27,6 +27,8 @@ Detalles de uso y funcionamiento: `README.md`. Fallos conocidos y propuestas: `F
 ## Arquitectura (`jobbot.py`)
 - **Prompts**: `SYSTEM_SCORE` (extracción y puntuación; el perfil se construye desde `cv_base.json` con
   `main_skills()` y `adjacent_skills()`) y `SYSTEM_TAILOR` (perfil, competencias y carta).
+- **Proveedor**: `LLM_PROVIDER` (`anthropic`|`ollama`); `claude_json()` despacha en `_llm_text()`.
+- **CV**: `render_cv()` rellena `plantilla/cv.html.j2` y exporta con Playwright (formato fijo; el modelo no decide el diseño).
 - **Modelos**: `SCORE_MODEL` (Haiku, por defecto) para puntuar; `CLAUDE_MODEL` (Sonnet) para carta y CV. Se cambian
   por variable de entorno. `claude_json()` extrae el JSON con una regex y lanza error si `stop_reason == max_tokens`.
 - **Pipeline**: `process_text()` → puntúa → por oferta: resuelve enlace (`resolve_url`) → dedup por número de

@@ -2,3 +2,5 @@ anthropic
 reportlab
 python-dotenv
 requests
+jinja2
+playwright

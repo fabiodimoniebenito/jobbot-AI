@@ -32,8 +32,13 @@ BASE = Path(__file__).parent
 load_dotenv(BASE / ".env")
 
 CV = json.loads((BASE / "cv_base.json").read_text(encoding="utf-8"))
-MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-5-5")  # carta y CV (calidad de redacción)
-SCORE_MODEL = os.getenv("SCORE_MODEL", "claude-haiku-5-5")  # extracción y puntuación (barato)
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "anthropic").lower()  # "anthropic" | "ollama"
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434").rstrip("/")
+OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "8192"))  # el valor por defecto de Ollama trunca ofertas largas
+_DEF_MODEL, _DEF_SCORE = (("qwen2.5:14b", "qwen2.5:7b") if LLM_PROVIDER == "ollama"
+                          else ("claude-sonnet-5-5", "claude-haiku-5-5"))
+MODEL = os.getenv("CLAUDE_MODEL", _DEF_MODEL)  # carta y CV (calidad de redacción)
+SCORE_MODEL = os.getenv("SCORE_MODEL", _DEF_SCORE)  # extracción y puntuación (barato)
 MIN_SCORE = int(os.getenv("MIN_SCORE", "65"))
 OUT_DIR = BASE / "salidas"
 PENDING_FILE = BASE / "pendientes.json"
@@ -120,28 +125,49 @@ Return ONLY valid JSON:
 "carta":"","huecos":[],"avisos":[]}
 "competencias_destacadas" must be exact skill names copied from the CV JSON "competencias" (max 8).
 "competencias_adyacentes_destacadas" must be exact names from "competencias_adyacentes" (max 4).
-"perfil_adaptado": max 3 lines."""
+"perfil_adaptado": ONE paragraph in Spanish or English, 400-600 characters, same structure as the base profile: role + stack + studies + what he builds + what he seeks. Only CV facts."""
 
 
 # ---------------------------------------------------------------- utilidades
 
-def claude_json(system: str, user: str, max_tokens: int = 2000, model: str | None = None) -> dict:
+def _llm_text(system: str, user: str, max_tokens: int, model: str) -> str:
+    if LLM_PROVIDER == "ollama":
+        r = requests.post(f"{OLLAMA_URL}/api/chat", timeout=600, json={
+            "model": model, "stream": False, "format": "json",
+            "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+            "options": {"num_ctx": OLLAMA_NUM_CTX, "num_predict": max_tokens, "temperature": 0.3},
+        })
+        r.raise_for_status()
+        d = r.json()
+        if d.get("done_reason") == "length":
+            raise ValueError(f"respuesta cortada por num_predict ({max_tokens}); sube el límite")
+        return d["message"]["content"]
+
     from anthropic import Anthropic
 
     client = Anthropic()  # usa ANTHROPIC_API_KEY
     r = client.messages.create(
-        model=model or MODEL,
+        model=model,
         max_tokens=max_tokens,
         system=system,
         messages=[{"role": "user", "content": user}],
     )
     if r.stop_reason == "max_tokens":
         raise ValueError(f"respuesta cortada por max_tokens ({max_tokens}); sube el límite")
-    txt = "".join(b.text for b in r.content if getattr(b, "type", "") == "text")
-    m = re.search(r"\{.*\}", txt, re.S)
-    if not m:
-        raise ValueError("Claude no devolvió JSON")
-    return json.loads(m.group(0))
+    return "".join(b.text for b in r.content if getattr(b, "type", "") == "text")
+
+
+def claude_json(system: str, user: str, max_tokens: int = 2000, model: str | None = None) -> dict:
+    # los modelos locales fallan más el JSON: un reintento
+    for intento in range(2 if LLM_PROVIDER == "ollama" else 1):
+        txt = _llm_text(system, user, max_tokens, model or MODEL)
+        m = re.search(r"\{.*\}", txt, re.S)
+        try:
+            if m:
+                return json.loads(m.group(0))
+        except json.JSONDecodeError:
+            pass
+    raise ValueError("el modelo no devolvió JSON válido")
 
 
 _LI_JOB_RE = re.compile(r"linkedin\.com/(?:comm/)?jobs/view/(\d+)")
@@ -281,63 +307,37 @@ def slug(s: str) -> str:
 
 # ---------------------------------------------------------------- PDF del CV
 
+MAX_PERFIL = 650  # caracteres; el CV modelo ocupa una página y el perfil mide ~560
+SECCIONES_COMP = [("backend", "Backend"), ("bases_de_datos", "Bases de datos"), ("testing", "Testing"),
+                  ("herramientas", "DevOps y herramientas"), ("frontend", "Frontend")]
+
+
 def render_cv(path: Path, perfil: str, destacadas: list[str], adyacentes: list[str] | None = None):
-    from reportlab.lib import colors
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib.styles import ParagraphStyle
-    from reportlab.lib.units import mm
-    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+    """PDF a partir de plantilla/cv.html.j2 (formato fijo); el modelo solo aporta perfil y orden de competencias."""
+    from jinja2 import Environment, FileSystemLoader, select_autoescape
+    from playwright.sync_api import sync_playwright
 
-    d = CV["datos"]
-    base = ParagraphStyle("b", fontName="Helvetica", fontSize=9.5, leading=12.5)
-    h = ParagraphStyle("h", parent=base, fontName="Helvetica-Bold", fontSize=10.5, spaceBefore=8,
-                       spaceAfter=3, textColor=colors.HexColor("#1f3a5f"))
-    name = ParagraphStyle("n", parent=base, fontName="Helvetica-Bold", fontSize=18, leading=22)
-    small = ParagraphStyle("s", parent=base, fontSize=9, textColor=colors.HexColor("#444444"))
-    bullet = ParagraphStyle("bl", parent=base, leftIndent=10, bulletIndent=0)
-
-    story = [Paragraph(escape(d["nombre"].upper()), name),
-             Paragraph(escape(f'{d["ubicacion"]} · {d["email"]}'), small),
-             Paragraph(escape(f'{d["linkedin"]} · {d["github"]}'), small)]
-
-    story += [Paragraph("PERFIL", h), Paragraph(escape(perfil), base)]
-
-    story.append(Paragraph("EXPERIENCIA", h))
-    for e in CV["experiencia"]:
-        story.append(Paragraph(
-            f'<b>{escape(e["puesto"])}</b> — {escape(e["empresa"])} '
-            f'<font color="#666666">({escape(e["inicio"])} – {escape(e["fin"])})</font>', base))
-        for lg in e.get("logros", []):
-            if "COMPLETAR" in lg or "VERIFICAR" in lg:
-                continue
-            story.append(Paragraph(escape(lg), bullet, bulletText="•"))
-        story.append(Spacer(1, 2))
-
-    story.append(Paragraph("EDUCACIÓN", h))
-    for e in CV["educacion"]:
-        story.append(Paragraph(
-            f'<b>{escape(e["titulo"])}</b> — {escape(e["centro"])} '
-            f'<font color="#666666">({escape(e["inicio"])} – {escape(e["fin"])})</font>', base))
-
-    story.append(Paragraph("COMPETENCIAS TÉCNICAS", h))
-    names = {"backend": "Backend", "bases_de_datos": "Bases de datos", "frontend": "Frontend",
-             "testing": "Testing", "herramientas": "Herramientas"}
+    perfil = " ".join((perfil or "").split())
+    if not perfil or len(perfil) > MAX_PERFIL:
+        perfil = CV["perfil_base"]
     dest = {x.lower() for x in destacadas}
-    for key, items in CV["competencias"].items():
-        ordered = sorted(items, key=lambda x: 0 if x.lower() in dest else 1)  # sort estable
-        story.append(Paragraph(f'<b>{names.get(key, key)}:</b> {escape(", ".join(ordered))}', base))
+    comp = [(nombre, sorted(CV["competencias"][k], key=lambda x: 0 if x.lower() in dest else 1))  # sort estable
+            for k, nombre in SECCIONES_COMP if CV["competencias"].get(k)]
+    ok = lambda t: "COMPLETAR" not in t and "VERIFICAR" not in t
+    exp = [{**e, "logros": [lg for lg in e.get("logros", []) if ok(lg)]} for e in CV["experiencia"]]
 
-    if adyacentes:
-        story.append(Paragraph(f'<b>Conocimientos básicos / en aprendizaje:</b> {escape(", ".join(adyacentes))}', base))
-
-    story.append(Paragraph("IDIOMAS", h))
-    story.append(Paragraph(escape(" · ".join(f'{i["idioma"]}: {i["nivel"]}' for i in CV["idiomas"])), base))
-    story.append(Paragraph("INFORMACIÓN ADICIONAL", h))
-    story.append(Paragraph(escape(CV["proyectos"]["texto"] + ". " + d["carnet"] + "."), base))
-
-    SimpleDocTemplate(str(path), pagesize=A4, leftMargin=18 * mm, rightMargin=18 * mm,
-                      topMargin=14 * mm, bottomMargin=14 * mm,
-                      title=f'CV {d["nombre"]}', author=d["nombre"]).build(story)
+    tdir = BASE / "plantilla"
+    env = Environment(loader=FileSystemLoader(tdir), autoescape=select_autoescape(["j2"], default_for_string=True))
+    html = env.get_template("cv.html.j2").render(
+        css=(tdir / "cv.css").read_text(encoding="utf-8"), d=CV["datos"], perfil=perfil, educacion=CV["educacion"],
+        experiencia=exp, competencias=comp, adyacentes=adyacentes or [], idiomas=CV["idiomas"],
+        habilidades=CV["habilidades_blandas"])
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch()
+        page = browser.new_page()
+        page.set_content(html)
+        page.pdf(path=str(path), prefer_css_page_size=True, print_background=True)
+        browser.close()
 
 
 # ---------------------------------------------------------------- pipeline

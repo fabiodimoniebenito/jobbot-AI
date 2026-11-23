@@ -1,0 +1,14 @@
+@page { size: A4; margin: 14mm 15mm; }
+* { box-sizing: border-box; }
+body { font-family: Calibri, Carlito, Arial, Helvetica, sans-serif; font-size: 10.5pt; line-height: 1.28; color: #000; margin: 0; }
+h1 { text-align: center; font-size: 22pt; margin: 0 0 2px; letter-spacing: .3px; }
+.contacto { text-align: center; }
+.contacto a { color: #000; }
+h2 { font-size: 10.5pt; margin: 9px 0 3px; padding-bottom: 1px; border-bottom: 1.2px solid #000; text-transform: uppercase; }
+p { margin: 0; }
+.fila { display: flex; justify-content: space-between; }
+.fila b { font-weight: 700; }
+.sub { font-style: italic; }
+ul { margin: 0; padding-left: 18px; }
+.comp { padding-left: 10px; }
+.item { break-inside: avoid; }

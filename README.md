@@ -102,3 +102,13 @@ del repositorio y están en `.gitignore`.
 ## Automatizar el `scan`
 Programador de tareas de Windows: tarea diaria que ejecute `py jobbot.py scan` en esta carpeta. Luego solo haces
 `review` cuando quieras.
+
+## Formato del CV (plantilla)
+El PDF se genera desde `plantilla/cv.html.j2` + `plantilla/cv.css` (Jinja2 + Playwright/Chromium), copiando el formato de
+`CV_Fabio_Dimonie_Junior_Backend.pdf`. El modelo solo aporta el perfil (≤ 650 caracteres; si se pasa, se usa
+`perfil_base`) y qué competencias van primero. Secciones, orden y estilo se cambian en la plantilla. Primera vez:
+`py -m pip install -r requirements.txt` y `py -m playwright install chromium`.
+
+## Ollama (modelo local)
+`ollama pull qwen2.5:14b` y `ollama pull qwen2.5:7b`; en `.env`: `LLM_PROVIDER=ollama` (y, si quieres otros modelos,
+`SCORE_MODEL`/`CLAUDE_MODEL` con su nombre en Ollama). `OLLAMA_URL` y `OLLAMA_NUM_CTX` son opcionales.

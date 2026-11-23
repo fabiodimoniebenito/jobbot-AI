@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>CV {{ d.nombre }}</title>
+<style>{{ css }}</style></head>
+<body>
+<h1>{{ d.nombre | upper }}</h1>
+<p class="contacto">{{ d.ubicacion }}{% if d.telefono %} · {{ d.telefono }}{% endif %} · {{ d.email }}<br>
+<a href="https://{{ d.linkedin }}">{{ d.linkedin }}</a> · <a href="https://{{ d.github }}">{{ d.github }}</a></p>
+
+<h2>Perfil</h2>
+<p>{{ perfil }}</p>
+
+<h2>Educación</h2>
+{% for e in educacion %}<div class="item"><div class="fila"><b>{{ e.titulo }}</b><span>{{ e.inicio }} – {{ e.fin }}</span></div>
+<p class="sub">{{ e.centro }}</p></div>
+{% endfor %}
+<h2>Experiencia laboral</h2>
+{% for e in experiencia %}<div class="item"><div class="fila"><b>{{ e.puesto }}</b><span>{{ e.periodo or (e.inicio ~ ' – ' ~ e.fin) }}</span></div>
+<p class="sub">{{ e.empresa }}</p>
+{% if e.logros %}<ul>{% for l in e.logros %}<li>{{ l }}</li>{% endfor %}</ul>{% endif %}</div>
+{% endfor %}
+<h2>Competencias técnicas</h2>
+<div class="comp">{% for nombre, items in competencias %}<p><b>{{ nombre }}:</b> {{ items | join(', ') }}.</p>
+{% endfor %}{% if adyacentes %}<p><b>Conocimientos básicos / en aprendizaje:</b> {{ adyacentes | join(', ') }}.</p>{% endif %}</div>
+
+<h2>Idiomas</h2>
+<ul>{% for i in idiomas %}<li><b>{{ i.idioma }}:</b> {{ i.nivel }}.</li>{% endfor %}</ul>
+
+<h2>Información adicional</h2>
+<ul><li><b>Habilidades:</b> {{ habilidades | join(', ') }}.</li><li>{{ d.carnet }}.</li></ul>
+</body></html>
