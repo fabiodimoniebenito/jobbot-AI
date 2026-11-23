@@ -7,18 +7,27 @@ una carta adaptados **sin inventar nada**, y te deja revisarlo todo antes de env
 **Nunca envía nada sin que pulses `s` y escribas "si" en `review`.**
 
 ```
-Gmail (etiqueta "ofertas")
-   │  scan
-   ▼
-Haiku extrae y puntúa ──► filtro duro en Python (senior/lead, 3+ años) ──► puntuación ≥ MIN_SCORE
-                                                                              │
-                                    ofertas.html (todas, con enlace) ◄────────┤
-                                                                              ▼
-                                           Sonnet adapta perfil + carta ──► salidas/<fecha>_<empresa>_<puesto>/
-                                                                              │   CV_Fabio_Dimonie.pdf
-                                                                              │   carta.txt (editable)
-                                                                              ▼
-                                                              review: editar / enviar / descartar
+Gmail (etiqueta "ofertas")        scan / add (URL, .txt o texto)
+        │                                   │
+        └───────────────┬───────────────────┘
+                        ▼
+     Modelo de puntuación (SCORE_MODEL) extrae y puntúa cada oferta
+                        ▼
+     Filtro duro en Python (senior/lead, 3+ años) ──► puntuación ≥ MIN_SCORE
+                        │                                   │
+                        ▼                                   ▼
+     data/ofertas.html (todas, con enlace)      Modelo de redacción (CLAUDE_MODEL) escribe la carta
+                                                  + orden de competencias y cierre del perfil
+                                                            │      (el resto del CV sale del PDF maestro)
+                                                            ▼
+                                       data/salidas/<fecha>_<empresa>_<puesto>/
+                                           CV_Fabio_Dimonie.pdf  (plantilla = CV maestro)
+                                           carta.txt             (editable)
+                                                            ▼
+                                       review: editar / enviar / descartar / enviada a mano
+
+   Proveedor de modelos: Anthropic u Ollama (LLM_PROVIDER)
+   CV: sync-cv vuelca el PDF maestro en cv_base.json
 ```
 
 ## Instalación (Windows)
