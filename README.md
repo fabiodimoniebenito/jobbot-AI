@@ -1,5 +1,7 @@
 # jobbot: candidaturas semiautomáticas
 
+Guía paso a paso y comandos: [`MANUAL.md`](MANUAL.md).
+
 Lee alertas de empleo de Gmail, puntúa cada oferta, descarta las que no encajan por nivel, prepara un CV (PDF) y
 una carta adaptados **sin inventar nada**, y te deja revisarlo todo antes de enviar.
 **Nunca envía nada sin que pulses `s` y escribas "si" en `review`.**
