@@ -1,11 +1,6 @@
 .env
 cv_base.json
-salidas/
-pendientes.json
-vistas.json
-registro.csv
+data/
 __pycache__/
-
-ofertas.json
-ofertas.html
+.pytest_cache/
 CV_Fabio_Dimonie_Junior_Backend.pdf

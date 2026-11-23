@@ -90,7 +90,6 @@ fuera de Madrid penaliza; remoto España/UE no. Configurable en `.env`.
 **Propuesta.** El usuario confirma cuáles son ciertas y pone el nivel; probar con una oferta que pida esa tecnología.
 
 ## 13. Higiene del proyecto (bajo)
-- Sin tests: añadir pruebas de `hard_reject`, `resolve_url`, `extract_job_links` y `valid_skills` (no necesitan red).
 - `salidas/` conserva carpetas de borradores ya borrados o duplicados (hay más carpetas que pendientes). Añadir un
   comando de limpieza que borre las que no estén en `pendientes.json`.
 - ~~`.env.example` contiene un correo real~~: resuelto. Además `cv_base.json` (datos reales) pasó a `.gitignore` y hay

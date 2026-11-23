@@ -49,7 +49,7 @@ Haiku extrae y puntúa ──► filtro duro en Python (senior/lead, 3+ años) �
 1. **Extracción y puntuación** (`SCORE_MODEL`, por defecto Haiku, barato). Devuelve por oferta: empresa, puesto,
    ubicación, enlace, `seniority`, `anios_requeridos`, puntuación 0-100 y motivo. Pesos: nivel 45 %, stack 25 %,
    ubicación/remoto 15 %, idioma 15 %.
-2. **Filtro duro en Python** (`hard_reject` en `jobbot.py`): se descarta si `seniority` es senior/lead, si el
+2. **Filtro duro en Python** (`hard_reject` en `jobbot/domain/filters.py`): se descarta si `seniority` es senior/lead, si el
    título contiene senior/lead/principal/staff, o si `anios_requeridos` > `MAX_YEARS` (2, es decir 3+ años).
    1-2 años no descarta.
 3. **Stack flexible**: una tecnología distinta pero afín solo penaliza un poco. Solo un stack totalmente ajeno
@@ -75,11 +75,11 @@ reconocen por su número de oferta de LinkedIn.
 
 | Archivo | Contenido |
 |---|---|
-| `ofertas.html` / `ofertas.json` | **Todas** las ofertas vistas: puntuación, estado, enlace, motivo. Incluye descartadas. Se regenera sola. |
-| `salidas/<fecha>_<empresa>_<puesto>/` | `CV_Fabio_Dimonie.pdf` y `carta.txt`. Retoca `carta.txt`: `review` lee siempre ese archivo. |
-| `pendientes.json` | Borradores esperando `review`. |
-| `vistas.json` | Huellas de ofertas ya procesadas (evita repetirlas). |
-| `registro.csv` | Historial: fecha, empresa, puesto, puntuación, enlace, estado. |
+| `data/ofertas.html` / `data/ofertas.json` | **Todas** las ofertas vistas: puntuación, estado, enlace, motivo. Incluye descartadas. Se regenera sola. |
+| `data/salidas/<fecha>_<empresa>_<puesto>/` | `CV_Fabio_Dimonie.pdf` y `carta.txt`. Retoca `carta.txt`: `review` lee siempre ese archivo. |
+| `data/pendientes.json` | Borradores esperando `review`. |
+| `data/vistas.json` | Huellas de ofertas ya procesadas (evita repetirlas). |
+| `data/registro.csv` | Historial: fecha, empresa, puesto, puntuación, enlace, estado. |
 | `cv_base.json` | Perfil y CV maestro. |
 
 Todos los archivos generados están en `.gitignore`.
@@ -96,7 +96,7 @@ Todos los archivos generados están en `.gitignore`.
 La lista de fallos conocidos y propuestas está en [`FALLOS_Y_MEJORAS.md`](FALLOS_Y_MEJORAS.md).
 
 ## Licencia
-MIT. Ver [`LICENSE`](LICENSE). Los datos personales (`cv_base.json`, `.env`, `salidas/`, `ofertas.*`…) no forman parte
+MIT. Ver [`LICENSE`](LICENSE). Los datos personales (`cv_base.json`, `.env`, `data/`…) no forman parte
 del repositorio y están en `.gitignore`.
 
 ## Automatizar el `scan`
