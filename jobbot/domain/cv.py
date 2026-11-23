@@ -1,5 +1,6 @@
 """CV base (cv_base.json) y reglas anti-invención sobre las competencias."""
 import json
+import re
 
 from jobbot.config import CV_FILE
 
@@ -40,3 +41,32 @@ def valid_adjacent(destacadas: list[str]) -> list[str]:
     """Solo adyacentes verificadas; devuelve 'Nombre (nivel)'."""
     adj = adjacent_skills()
     return [f"{adj[x.lower()][0]} ({adj[x.lower()][1]})" for x in destacadas if x.lower() in adj][:4]
+
+
+MAX_CIERRE = 220  # caracteres; la frase final del maestro mide ~190
+
+
+def _vocabulario() -> set[str]:
+    """Palabras que ya aparecen en el CV: base para detectar tecnologías inventadas en el cierre del perfil."""
+    textos = [CV.get("perfil_base", ""), *main_skills()]
+    for e in CV.get("experiencia", []):
+        textos += [e.get("puesto", ""), e.get("empresa", ""), *e.get("logros", [])]
+    textos += [e.get("titulo", "") + " " + e.get("centro", "") for e in CV.get("educacion", [])]
+    return {w.lower() for t in textos for w in re.findall(r"[\wÁÉÍÓÚÑáéíóúñ.+#]+", t)}
+
+
+def compose_perfil(cierre: str | None) -> str:
+    """Perfil = cuerpo del CV maestro + cierre. El cierre propuesto por el modelo solo vale si es una frase corta
+    y no nombra nada (tecnología, empresa) que no esté ya en el CV; si no, se usa el cierre del maestro."""
+    cuerpo = CV.get("perfil_cuerpo")
+    base = CV.get("perfil_cierre", "")
+    if not cuerpo:
+        return CV["perfil_base"]
+    c = " ".join((cierre or "").split())
+    palabras = re.findall(r"[\wÁÉÍÓÚÑáéíóúñ.+#]+", c)
+    vocab = _vocabulario()
+    inventa = any(w[:1].isupper() and i > 0 and w.lower().strip(".") not in vocab and w.lower() not in vocab
+                  for i, w in enumerate(palabras))
+    if not c or len(c) > MAX_CIERRE or c.count(". ") or not c.endswith(".") or inventa:
+        c = base
+    return f"{cuerpo} {c}".strip()

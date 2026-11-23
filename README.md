@@ -103,11 +103,15 @@ del repositorio y están en `.gitignore`.
 Programador de tareas de Windows: tarea diaria que ejecute `py jobbot.py scan` en esta carpeta. Luego solo haces
 `review` cuando quieras.
 
-## Formato del CV (plantilla)
-El PDF se genera desde `plantilla/cv.html.j2` + `plantilla/cv.css` (Jinja2 + Playwright/Chromium), copiando el formato de
-`CV_Fabio_Dimonie_Junior_Backend.pdf`. El modelo solo aporta el perfil (≤ 650 caracteres; si se pasa, se usa
-`perfil_base`) y qué competencias van primero. Secciones, orden y estilo se cambian en la plantilla. Primera vez:
-`py -m pip install -r requirements.txt` y `py -m playwright install chromium`.
+## CV maestro y formato
+El **PDF maestro** (`CV_Fabio_Dimonie_Junior_Backend.pdf`, ruta en `MASTER_CV`) manda. `py jobbot.py sync-cv` muestra
+qué cambiaría en `cv_base.json`; con `--aplicar` lo escribe (antes copia `cv_base.json.bak`). Los logros de
+`cv_base.json` que el PDF ya no tiene pasan a `logros_extra`: no salen en el CV, pero la carta puede usarlos.
+El PDF se genera desde `plantilla/cv.html.j2` + `plantilla/cv.css` (Jinja2 + Playwright/Chromium). Por oferta solo varía:
+1. el **orden de las competencias** dentro de cada línea, y
+2. la **última frase del perfil** (`perfil_cierre`): una frase en español, sin nombrar empresa ni tecnologías ajenas al
+   CV. Si no cumple, se usa la del maestro. El resto del perfil (`perfil_cuerpo`) es fijo.
+Primera vez: `py -m pip install -r requirements.txt` y `py -m playwright install chromium`.
 
 ## Ollama (modelo local)
 `ollama pull qwen2.5:14b` y `ollama pull qwen2.5:7b`; en `.env`: `LLM_PROVIDER=ollama` (y, si quieres otros modelos,

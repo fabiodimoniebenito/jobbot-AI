@@ -4,7 +4,7 @@ import hashlib
 import json
 
 from jobbot.config import MIN_SCORE, OFFERS_FILE, OUT_DIR, PENDING_FILE, SCORE_MODEL, SEEN_FILE
-from jobbot.domain.cv import CV, cv_for_tailor, valid_adjacent, valid_skills
+from jobbot.domain.cv import compose_perfil, cv_for_tailor, valid_adjacent, valid_skills
 from jobbot.domain.filters import hard_reject
 from jobbot.domain.links import job_id, resolve_url
 from jobbot.domain.text import slug
@@ -62,7 +62,7 @@ def process_text(text: str, fuente: str, links: list[dict] | None = None):
         folder = OUT_DIR / f"{dt.date.today():%Y%m%d}_{slug(o.get('empresa'))}_{slug(o.get('puesto'))}"
         folder.mkdir(parents=True, exist_ok=True)
         pdf = folder / "CV_Fabio_Dimonie.pdf"
-        render_cv(pdf, t.get("perfil_adaptado") or CV["perfil_base"], valid_skills(t.get("competencias_destacadas", [])),
+        render_cv(pdf, compose_perfil(t.get("perfil_cierre")), valid_skills(t.get("competencias_destacadas", [])),
                   valid_adjacent(t.get("competencias_adyacentes_destacadas", [])))
         (folder / "carta.txt").write_text(t["carta"], encoding="utf-8")
 

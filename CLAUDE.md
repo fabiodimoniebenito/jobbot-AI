@@ -6,7 +6,7 @@ Detalles de uso y funcionamiento: `README.md`. Fallos conocidos y propuestas: `F
 
 ## Comandos (Windows; usar `py`, `python` puede no estar en el PATH)
 - `py -m pip install -r requirements.txt`
-- `py jobbot.py scan [--todos]`, `add <url|.txt|texto>`, `review`, `list` (también `py -m jobbot ...`)
+- `py jobbot.py scan [--todos]`, `add <url|.txt|texto>`, `review`, `list`, `sync-cv [--aplicar]` (también `py -m jobbot ...`)
 - Tests (sin red ni API): `py -m pip install -r requirements-dev.txt` y `py -m pytest`. Usan `cv_base.example.json`.
 - Salida generada en `data/`: `ofertas.html/json`, `pendientes.json`, `vistas.json`, `registro.csv`, `salidas/`
 
@@ -37,6 +37,8 @@ Las dependencias van hacia dentro: `cli` → `services` → `infra`/`llm` → `d
 - `infra/`: `gmail.py` (`scan_gmail(procesar, todos)` recibe el callback; `send_mail`), `web.py` (`fetch_page`),
   `storage.py` (JSON, `log`, `record_offer`, `ofertas.html`), `pdf.py` (`render_cv`: `plantilla/cv.html.j2` + Playwright).
 - `services/`: `pipeline.py` (`process_text`) y `review.py` (`review`).
+- `domain/master.py` + `infra/master_cv.py`: el PDF maestro (`MASTER_CV`) es la fuente de verdad; `sync-cv` lo vuelca en
+  `cv_base.json` (conserva adyacentes, proyectos y lo que el PDF no tiene; logros viejos -> `logros_extra`, solo para la carta).
 - `cli.py`: argparse. `jobbot.py` en la raíz es solo un wrapper.
 - **Prompts**: `SYSTEM_SCORE` puntúa; `SYSTEM_TAILOR` devuelve perfil, competencias y carta.
 - **Modelos**: `SCORE_MODEL` (Haiku por defecto) puntúa; `MODEL`/`CLAUDE_MODEL` (Sonnet) hace carta y CV. Con
@@ -57,8 +59,9 @@ Las dependencias van hacia dentro: `cli` → `services` → `infra`/`llm` → `d
 - Comentarios breves, solo cuando explican un porqué. Mantener el estilo y respetar el sentido de las dependencias entre capas.
 - **No ejecutar dos procesos que escriban `pendientes.json`/`ofertas.json` a la vez** (un `scan` largo pisó una limpieza
   manual). No hay bloqueo de archivos. Esperar a que `scan` termine antes de editar los JSON.
-- `perfil_adaptado` y las competencias elegidas por el modelo **no se guardan**: si se borra una carpeta de `data/salidas/`
-  y se regenera el PDF, se pierde la adaptación (queda el perfil base).
+- El CV solo puede variar por oferta en el orden de competencias y en `perfil_cierre` (última frase del perfil, validada por
+  `compose_perfil()`). Ninguno de los dos **se guarda**: si se regenera un PDF de `data/salidas/`, queda el perfil del maestro.
+- No tocar a mano el texto del CV en `cv_base.json`: edita el PDF maestro y ejecuta `sync-cv`.
 - Las alertas de LinkedIn llegan truncadas; muchas ofertas se puntúan solo con el título. Las puntuaciones de esas
   ofertas son poco fiables.
 - PowerShell y comillas: para scripts de Python con f-strings o comillas anidadas, escribirlos en un archivo y ejecutarlo

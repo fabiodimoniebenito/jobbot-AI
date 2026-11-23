@@ -9,6 +9,7 @@ load_dotenv(BASE / ".env")
 
 CV_FILE = Path(os.getenv("CV_FILE", BASE / "cv_base.json"))
 TEMPLATE_DIR = BASE / "plantilla"
+MASTER_CV = Path(os.getenv("MASTER_CV", BASE / "CV_Fabio_Dimonie_Junior_Backend.pdf"))  # CV maestro: manda sobre cv_base.json
 
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "anthropic").lower()  # "anthropic" | "ollama"
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434").rstrip("/")

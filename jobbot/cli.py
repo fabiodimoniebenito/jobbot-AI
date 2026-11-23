@@ -5,6 +5,7 @@ jobbot: pipeline semiautomático de candidaturas.
   add    -> lo mismo para una oferta suelta (URL, archivo de texto o texto pegado)
   review -> te enseña cada borrador y TÚ decides si se envía (nunca envía solo)
   list   -> muestra pendientes y registro
+  sync-cv -> actualiza cv_base.json desde el PDF del CV maestro
 
 Nada se envía sin tu aprobación explícita en `review`.
 """
@@ -12,8 +13,9 @@ import argparse
 import sys
 from pathlib import Path
 
-from jobbot.config import LOG_FILE, OFFERS_HTML, PENDING_FILE
+from jobbot.config import CV_FILE, LOG_FILE, MASTER_CV, OFFERS_HTML, PENDING_FILE
 from jobbot.infra.gmail import scan_gmail
+from jobbot.infra.master_cv import sync_cv
 from jobbot.infra.storage import load_json
 from jobbot.infra.web import fetch_page
 from jobbot.services.pipeline import process_text
@@ -28,6 +30,8 @@ def main():
     a = sub.add_parser("add")
     a.add_argument("fuente", help="URL, ruta a un .txt, o el texto de la oferta entre comillas")
     sub.add_parser("review")
+    sy = sub.add_parser("sync-cv", help="actualiza cv_base.json desde el PDF del CV maestro (sin --aplicar solo muestra el diff)")
+    sy.add_argument("--aplicar", action="store_true")
     sub.add_parser("list")
     args = ap.parse_args()
 
@@ -43,6 +47,11 @@ def main():
         else:
             text = f
         process_text(text, "add")
+    elif args.cmd == "sync-cv":
+        diff = sync_cv(MASTER_CV, CV_FILE, args.aplicar)
+        print(diff or "cv_base.json ya coincide con el CV maestro.")
+        if diff and not args.aplicar:
+            print("\n(solo vista previa; usa --aplicar para escribir cv_base.json)")
     elif args.cmd == "review":
         review()
     elif args.cmd == "list":

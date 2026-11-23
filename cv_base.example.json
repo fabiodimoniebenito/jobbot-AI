@@ -7,40 +7,98 @@
     "github": "github.com/tu-usuario",
     "carnet": "Carnet B y vehículo propio"
   },
-  "perfil_base": "Desarrollador orientado al backend con Java y Spring Boot, en aprendizaje constante. Escribe aquí 2-3 frases reales sobre ti, sin exagerar.",
+  "perfil_base": "Desarrollador backend junior con Java y Spring Boot. Me centro en construir APIs REST fiables. Busco un equipo del que aprender y al que aportar.",
   "educacion": [
-    {"titulo": "CFGS en Desarrollo de Aplicaciones Multiplataforma (DAM)", "centro": "Centro de Formación Ejemplo", "inicio": "Sept 2024", "fin": "Jun 2027"}
+    {
+      "titulo": "CFGS en Desarrollo de Aplicaciones Multiplataforma (DAM)",
+      "centro": "Centro de Formación Ejemplo",
+      "inicio": "Sept 2024",
+      "fin": "Jun 2027"
+    }
   ],
   "experiencia": [
     {
-      "puesto": "Desarrollador de Software (Prácticas)", "empresa": "Empresa Ejemplo S.L.", "inicio": "Oct 2026", "fin": "Actualidad",
+      "puesto": "Desarrollador de Software (Prácticas)",
+      "empresa": "Empresa Ejemplo S.L.",
+      "inicio": "Oct 2026",
+      "fin": "Actualidad",
       "relevancia": "alta",
       "logros": [
         "Describe aquí un logro real y concreto, con resultado si lo hay.",
         "COMPLETAR: los logros con este marcador se omiten del CV."
       ]
     },
-    {"puesto": "Empleado", "empresa": "Negocio Ejemplo", "inicio": "Jul 2026", "fin": "Actualidad", "relevancia": "baja", "logros": []}
+    {
+      "puesto": "Empleado",
+      "empresa": "Negocio Ejemplo",
+      "inicio": "Jul 2026",
+      "fin": "Actualidad",
+      "relevancia": "baja",
+      "logros": []
+    }
   ],
   "proyectos": {
     "texto": "Proyectos personales públicos en GitHub: github.com/tu-usuario",
     "nota": "No se detallan proyectos concretos; solo se remite al perfil de GitHub."
   },
   "competencias": {
-    "backend": ["Java", "Spring Boot", "Spring Data JPA", "Spring Web (APIs REST)", "Maven"],
-    "bases_de_datos": ["PostgreSQL", "MySQL"],
-    "frontend": ["Angular", "TypeScript", "HTML", "CSS"],
-    "testing": ["JUnit", "Mockito"],
-    "herramientas": ["Git", "GitHub", "Docker", "IntelliJ IDEA"]
+    "backend": [
+      "Java",
+      "Spring Boot",
+      "Spring Data JPA",
+      "Spring Web (APIs REST)",
+      "Maven"
+    ],
+    "bases_de_datos": [
+      "PostgreSQL",
+      "MySQL"
+    ],
+    "frontend": [
+      "Angular",
+      "TypeScript",
+      "HTML",
+      "CSS"
+    ],
+    "testing": [
+      "JUnit",
+      "Mockito"
+    ],
+    "herramientas": [
+      "Git",
+      "GitHub",
+      "Docker",
+      "IntelliJ IDEA"
+    ]
   },
   "competencias_adyacentes": [
-    {"nombre": "Python", "nivel": "VERIFICAR"},
-    {"nombre": "Node.js", "nivel": "VERIFICAR"},
-    {"nombre": "AWS", "nivel": "VERIFICAR"}
+    {
+      "nombre": "Python",
+      "nivel": "VERIFICAR"
+    },
+    {
+      "nombre": "Node.js",
+      "nivel": "VERIFICAR"
+    },
+    {
+      "nombre": "AWS",
+      "nivel": "VERIFICAR"
+    }
   ],
   "idiomas": [
-    {"idioma": "Español", "nivel": "Nativo"},
-    {"idioma": "Inglés", "nivel": "B2"}
+    {
+      "idioma": "Español",
+      "nivel": "Nativo"
+    },
+    {
+      "idioma": "Inglés",
+      "nivel": "B2"
+    }
   ],
-  "habilidades_blandas": ["comunicación", "trabajo en equipo", "autodidacta"]
+  "habilidades_blandas": [
+    "comunicación",
+    "trabajo en equipo",
+    "autodidacta"
+  ],
+  "perfil_cuerpo": "Desarrollador backend junior con Java y Spring Boot. Me centro en construir APIs REST fiables.",
+  "perfil_cierre": "Busco un equipo del que aprender y al que aportar."
 }

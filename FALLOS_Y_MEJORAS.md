@@ -53,9 +53,9 @@ de una en una las ofertas de correos largos. Subir `max_tokens` según el nº de
 team lead`. Registrar `anios_requeridos` en `ofertas.json` para auditar.
 
 ## 6. La adaptación del CV no se guarda (medio)
-**Qué pasa.** `perfil_adaptado` y las competencias destacadas no se persisten. Al regenerar un PDF (se hizo con 4
+**Qué pasa.** `perfil_cierre` y las competencias destacadas no se persisten. Al regenerar un PDF (se hizo con 4
 borradores restaurados) se pierde la adaptación y sale el perfil base.
-**Propuesta.** Guardar en `pendientes.json` los campos `perfil_adaptado`, `competencias_destacadas` y
+**Propuesta.** Guardar en `pendientes.json` los campos `perfil_cierre`, `competencias_destacadas` y
 `competencias_adyacentes_destacadas`, y un comando `regenerar <id>` que rehaga el PDF sin llamar al modelo.
 
 ## 7. Casi ningún borrador se puede enviar por correo (medio)
