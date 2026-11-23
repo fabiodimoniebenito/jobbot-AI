@@ -66,8 +66,10 @@ Gmail (etiqueta "ofertas")        scan / add (URL, .txt o texto)
 3. **Stack flexible**: una tecnología distinta pero afín solo penaliza un poco. Solo un stack totalmente ajeno
    (SAP, iOS nativo…) puntúa bajo. Se aceptan ofertas de la UE y remotas.
 4. **Umbral**: puntuación < `MIN_SCORE` → descartada (pero queda registrada con su enlace y motivo).
-5. **Adaptación** (`CLAUDE_MODEL`, por defecto Sonnet): reescribe el perfil, elige hasta 8 competencias del CV y
-   redacta la carta (130-170 palabras, trato neutro en español: "la empresa/el equipo", sin "ustedes/vosotros").
+5. **Adaptación** (`CLAUDE_MODEL`, por defecto Sonnet con Anthropic): propone la última frase del perfil (el resto
+   es fijo, del CV maestro), elige hasta 8 competencias del CV para ponerlas primero (y hasta 4 adyacentes) y redacta la
+   carta (130-170 palabras, trato neutro en español: "la empresa/el equipo", sin "ustedes/vosotros"). La frase del perfil
+   se valida en Python y, si no cumple, se usa la del maestro.
 
 ### Sin mentir
 - El modelo solo puede usar hechos de `cv_base.json`. Lo que falta va a `huecos`, nunca a la carta.
