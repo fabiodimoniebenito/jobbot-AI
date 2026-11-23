@@ -16,7 +16,7 @@ Gmail (etiqueta "ofertas")        scan / add (URL, .txt o texto)
      Filtro duro en Python (senior/lead, 3+ años) ──► puntuación ≥ MIN_SCORE
                         │                                   │
                         ▼                                   ▼
-     data/ofertas.html (todas, con enlace)      Modelo de redacción (CLAUDE_MODEL) escribe la carta
+     data/ofertas.html (enlace + CV + carta)    Modelo de redacción (CLAUDE_MODEL) escribe la carta
                                                   + orden de competencias y cierre del perfil
                                                             │      (el resto del CV sale del PDF maestro)
                                                             ▼
@@ -88,7 +88,7 @@ reconocen por su número de oferta de LinkedIn.
 
 | Archivo | Contenido |
 |---|---|
-| `data/ofertas.html` / `data/ofertas.json` | **Todas** las ofertas vistas: puntuación, estado, enlace, motivo. Incluye descartadas. Se regenera sola. |
+| `data/ofertas.html` / `data/ofertas.json` | **Todas** las ofertas vistas: puntuación, estado, enlace, motivo. Incluye descartadas. Para las que tienen borrador, enlaces al CV y la carta y desplegables para leerlos ahí mismo. Se regenera sola (y con `list`). |
 | `data/salidas/<fecha>_<empresa>_<puesto>/` | `CV_Fabio_Dimonie.pdf` y `carta.txt`. Retoca `carta.txt`: `review` lee siempre ese archivo. |
 | `data/pendientes.json` | Borradores esperando `review`. |
 | `data/vistas.json` | Huellas de ofertas ya procesadas (evita repetirlas). |

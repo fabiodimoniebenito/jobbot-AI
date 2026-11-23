@@ -35,7 +35,7 @@ Las dependencias van hacia dentro: `cli` → `services` → `infra`/`llm` → `d
 - `llm/`: `prompts.py` (`SYSTEM_SCORE`, construido desde `cv_base.json`; `SYSTEM_TAILOR`) y `client.py`
   (`claude_json()` sobre `_llm_text()`, que elige Anthropic u Ollama).
 - `infra/`: `gmail.py` (`scan_gmail(procesar, todos)` recibe el callback; `send_mail`), `web.py` (`fetch_page`),
-  `storage.py` (JSON, `log`, `record_offer`, `ofertas.html`), `pdf.py` (`render_cv`: `plantilla/cv.html.j2` + Playwright).
+  `storage.py` (JSON, `log`, `record_offer`, `ofertas.html`; cada oferta con borrador guarda `carpeta` y el HTML enlaza y despliega su CV y carta), `pdf.py` (`render_cv`: `plantilla/cv.html.j2` + Playwright).
 - `services/`: `pipeline.py` (`process_text`) y `review.py` (`review`).
 - `domain/master.py` + `infra/master_cv.py`: el PDF maestro (`MASTER_CV`) es la fuente de verdad; `sync-cv` lo vuelca en
   `cv_base.json` (conserva adyacentes, proyectos y lo que el PDF no tiene; logros viejos -> `logros_extra`, solo para la carta).

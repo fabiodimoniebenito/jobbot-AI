@@ -72,7 +72,7 @@ def process_text(text: str, fuente: str, links: list[dict] | None = None):
             "idioma": t.get("idioma", "es"), "carta": t["carta"], "pdf": str(pdf),
             "huecos": t.get("huecos", []), "avisos": t.get("avisos", []),
         })
-        log("pendiente", o)
+        log("pendiente", {**o, "pdf": str(pdf)})
         print(f"  + {o.get('puesto')} @ {o.get('empresa')}: {score} -> borrador en {folder.name}")
 
     save_json(SEEN_FILE, sorted(seen))

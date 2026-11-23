@@ -107,7 +107,7 @@ Todo lo generado está en `data/` (ignorado por git):
 
 | Archivo | Contenido |
 |---|---|
-| `data/ofertas.html` | **Todas** las ofertas vistas, con puntuación, estado, enlace y motivo. Ábrelo en el navegador. |
+| `data/ofertas.html` | **Todas** las ofertas vistas, con puntuación, estado, enlace y motivo. Ábrelo en el navegador. En las que tienen borrador verás también "CV (PDF)" y "Carta (.txt)", y los desplegables "Ver carta de presentación" y "Ver CV adaptado" para leerlos sin salir de la página. Si editas `carta.txt`, ejecuta `py jobbot.py list` para refrescarla. |
 | `data/salidas/<fecha>_<empresa>_<puesto>/` | `CV_Fabio_Dimonie.pdf` y `carta.txt` de cada borrador. |
 | `data/pendientes.json` | Borradores esperando `review`. |
 | `data/vistas.json` | Ofertas ya procesadas (para no repetirlas). |

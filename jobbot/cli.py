@@ -13,10 +13,10 @@ import argparse
 import sys
 from pathlib import Path
 
-from jobbot.config import CV_FILE, LOG_FILE, MASTER_CV, OFFERS_HTML, PENDING_FILE
+from jobbot.config import CV_FILE, LOG_FILE, MASTER_CV, OFFERS_FILE, OFFERS_HTML, PENDING_FILE
 from jobbot.infra.gmail import scan_gmail
 from jobbot.infra.master_cv import sync_cv
-from jobbot.infra.storage import load_json
+from jobbot.infra.storage import load_json, render_offers_html
 from jobbot.infra.web import fetch_page
 from jobbot.services.pipeline import process_text
 from jobbot.services.review import review
@@ -57,4 +57,5 @@ def main():
     elif args.cmd == "list":
         for p in load_json(PENDING_FILE, []):
             print(f'{p["id"]}  {p["puntuacion"]:>3}  {p["puesto"]} @ {p["empresa"]}')
+        render_offers_html(load_json(OFFERS_FILE, []))  # refleja ediciones de carta.txt
         print(f'\nRegistro: {LOG_FILE}\nOfertas con enlace y puntuación: {OFFERS_HTML}')
